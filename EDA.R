@@ -1,14 +1,6 @@
-# Read dataset
-student <- read.csv("student-por.csv", sep = ";")
-
-# Check sample size
-nrow(student)
-
-# Number of students in each group
-table(student$activities)
-
-# Summary statistics for final grades
-aggregate(G3 ~ activities, data = student,
+#summary statistics
+aggregate(G3 ~ activities,
+          data = student_clean,
           FUN = function(x) c(
             n = length(x),
             mean = mean(x),
@@ -16,23 +8,52 @@ aggregate(G3 ~ activities, data = student,
             median = median(x)
           ))
 
-# Compare distributions
-boxplot(G3 ~ activities, data = student,
+#boxplot
+boxplot(G3 ~ activities,
+        data = student_clean,
         xlab = "Extracurricular Activities",
         ylab = "Final Grade",
         main = "Final Grades by Activity Participation")
 
-# Total number of missing values
-sum(is.na(student))
+#histogram
+par(mfrow = c(1, 2))
 
-# Missing values in each variable
-colSums(is.na(student))
+hist(student_clean$G3[student_clean$activities == "No"],
+     main = "No Activities",
+     xlab = "Final Grade",
+     xlim = c(0, 20),
+     breaks = seq(-0.5, 20.5, 1))
 
-# Check activity categories
-table(student$activities)
+hist(student_clean$G3[student_clean$activities == "Yes"],
+     main = "Yes Activities",
+     xlab = "Final Grade",
+     xlim = c(0, 20),
+     breaks = seq(-0.5, 20.5, 1))
 
-# Check final grade distribution
-summary(student$G3)
+par(mfrow = c(1, 1))
 
-# Check invalid grades
-sum(student$G3 < 0 | student$G3 > 20, na.rm = TRUE)
+#check outliers
+# Find outliers for each group
+by(student_clean$G3,
+   student_clean$activities,
+   function(x) boxplot.stats(x)$out)
+
+# Calculate outlier boundaries within each group
+Q1 <- ave(student_clean$G3, student_clean$activities,
+          FUN = function(x) quantile(x, 0.25))
+
+Q3 <- ave(student_clean$G3, student_clean$activities,
+          FUN = function(x) quantile(x, 0.75))
+
+IQR_values <- Q3 - Q1
+
+# Identify outliers
+is_outlier <- student_clean$G3 < Q1 - 1.5 * IQR_values |
+  student_clean$G3 > Q3 + 1.5 * IQR_values
+
+# Remove outliers
+student_no_outliers <- student_clean[!is_outlier, ]
+
+# Check sample sizes
+nrow(student_clean)
+nrow(student_no_outliers)
