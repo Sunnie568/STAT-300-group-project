@@ -1,3 +1,5 @@
+ ## Exact Permutation Test
+ 
  ```{r}
 library(exactRankTests)
 set.seed(1234)
