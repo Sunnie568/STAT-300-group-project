@@ -1,36 +1,9 @@
-#summary statistics
-aggregate(G3 ~ activities,
-          data = student_clean,
-          FUN = function(x) c(
-            n = length(x),
-            mean = mean(x),
-            sd = sd(x),
-            median = median(x)
-          ))
-
 #boxplot
 boxplot(G3 ~ activities,
         data = student_clean,
         xlab = "Extracurricular Activities",
         ylab = "Final Grade",
         main = "Final Grades by Activity Participation")
-
-#histogram
-par(mfrow = c(1, 2))
-
-hist(student_clean$G3[student_clean$activities == "No"],
-     main = "No Activities",
-     xlab = "Final Grade",
-     xlim = c(0, 20),
-     breaks = seq(-0.5, 20.5, 1))
-
-hist(student_clean$G3[student_clean$activities == "Yes"],
-     main = "Yes Activities",
-     xlab = "Final Grade",
-     xlim = c(0, 20),
-     breaks = seq(-0.5, 20.5, 1))
-
-par(mfrow = c(1, 1))
 
 #check outliers
 # Find outliers for each group
@@ -54,6 +27,36 @@ is_outlier <- student_clean$G3 < Q1 - 1.5 * IQR_values |
 # Remove outliers
 student_no_outliers <- student_clean[!is_outlier, ]
 
-# Check sample sizes
-nrow(student_clean)
-nrow(student_no_outliers)
+#summary statistics without outliers
+aggregate(G3 ~ activities,
+          data = student_no_outliers,
+          FUN = function(x) c(
+            n = length(x),
+            mean = mean(x),
+            sd = sd(x),
+            median = median(x)
+          ))
+
+#New boxplot
+boxplot(G3 ~ activities,
+        data = student_no_outliers,
+        xlab = "Extracurricular Activities",
+        ylab = "Final Grade",
+        main = "Final Grades by Activity Participation")
+
+#histogram
+par(mfrow = c(1, 2))
+
+hist(student_no_outliers$G3[student_no_outliers$activities == "No"],
+     main = "No Activities",
+     xlab = "Final Grade",
+     xlim = c(0, 20),
+     breaks = seq(-0.5, 20.5, 1))
+
+hist(student_no_outliers$G3[student_no_outliers$activities == "Yes"],
+     main = "Yes Activities",
+     xlab = "Final Grade",
+     xlim = c(0, 20),
+     breaks = seq(-0.5, 20.5, 1))
+
+par(mfrow = c(1, 1))
