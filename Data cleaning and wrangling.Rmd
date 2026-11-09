@@ -8,7 +8,8 @@ output: github_document
 library(tidyverse)
 
 # 1. Import the original dataset
-student_performance_por <- read_delim("student-por.csv", delim = ";", show_col_types = FALSE)
+student_performance_por <- read_delim("student-por.csv", delim = ";",
+                                      show_col_types = FALSE)
 
 # 2. Check the variables before changing them
 checks <- tibble(
@@ -45,4 +46,6 @@ student_clean |>
     col.names = c("Extracurricular participation", "Students"),
     caption = "Sample sizes by activity participation"
   )
+
+write.csv(student_clean, "student_clean.csv", row.names = FALSE)
 ```
