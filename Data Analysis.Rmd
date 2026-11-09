@@ -1,0 +1,68 @@
+---
+title: "STAT 300 group project"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## GitHub Documents
+
+This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
+
+## Data Import & Data Wrangling
+
+```{r wrangling, message=FALSE}
+library(tidyverse)
+
+# 1. Import the original dataset
+student_performance_por <- read_delim("student-por.csv", delim = ";", show_col_types = FALSE)
+
+# 2. Check the variables before changing them
+checks <- tibble(
+  Check = c(
+    "Number of students",
+    "Missing activity status",
+    "Missing final grade",
+    "Grades outside 0–20",
+    "Exact duplicate full records"
+  ),
+  Result = c(
+    nrow(student_performance_por),
+    sum(is.na(student_performance_por$activities)),
+    sum(is.na(student_performance_por$G3)),
+    sum(student_performance_por$G3 < 0 | student_performance_por$G3 > 20,
+        na.rm = TRUE),
+    sum(duplicated(student_performance_por))
+  )
+)
+
+# 3. Prepare the dataset for EDA
+student_clean <- student_performance_por |>
+  select(activities, G3, school) |>
+  mutate(
+    activities = factor(
+      activities,
+      levels = c("no", "yes"),
+      labels = c("No", "Yes")
+    ),
+    school = factor(school)
+  )
+student_clean |>
+  count(activities, name = "Students") |>
+  knitr::kable(
+    col.names = c("Extracurricular participation", "Students"),
+    caption = "Sample sizes by activity participation"
+  )
+```
+
+## EDA
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
