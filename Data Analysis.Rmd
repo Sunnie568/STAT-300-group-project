@@ -40,14 +40,13 @@ checks <- tibble(
 
 # 3. Prepare the dataset for EDA
 student_clean <- student_performance_por |>
-  select(activities, G3, school) |>
+  select(activities, G3) |>
   mutate(
     activities = factor(
       activities,
       levels = c("no", "yes"),
       labels = c("No", "Yes")
-    ),
-    school = factor(school)
+    )
   )
 student_clean |>
   count(activities, name = "Students") |>
